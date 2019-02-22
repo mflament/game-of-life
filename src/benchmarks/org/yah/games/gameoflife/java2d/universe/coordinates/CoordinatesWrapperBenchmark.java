@@ -32,7 +32,7 @@ public class CoordinatesWrapperBenchmark {
 
 		@Setup(Level.Iteration)
 		public void setup() {
-			coordinate = WIDTH - random.nextInt(WIDTH * 2);
+			coordinate = WIDTH - random.nextInt(WIDTH * 4);
 		}
 	}
 
