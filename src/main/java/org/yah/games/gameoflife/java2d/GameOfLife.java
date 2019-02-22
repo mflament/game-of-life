@@ -39,6 +39,10 @@ public class GameOfLife {
 
 	private static final Long SEED = null;
 
+	private static final int SIZE = 512;
+
+	private static final int THREADS = 1;
+
 	private static final float RANDOM_FACTOR = .08f;
 
 	private final int universeSize;
@@ -68,7 +72,7 @@ public class GameOfLife {
 	}
 
 	public GameOfLife() {
-		this(512, 3, Rules.create(Rules.STANDARD_DEFINITION, IndexedRule::new));
+		this(SIZE, THREADS, Rules.create(Rules.STANDARD_DEFINITION, IndexedRule::new));
 	}
 
 	public GameOfLife(int universeSize, int updateThreadCount, Rule rule) {
