@@ -1,9 +1,8 @@
 package org.yah.games.gameoflife.opengl;
 
-public class GameOfLife extends GLApplication {
+public class GameOfLife extends GL2DApplication {
 
-	public GameOfLife() {
-	}
+	public GameOfLife() {}
 
 	@Override
 	protected String getTitle() {
@@ -18,5 +17,5 @@ public class GameOfLife extends GLApplication {
 	public static void main(String[] args) {
 		new GameOfLife().start();
 	}
-	
+
 }

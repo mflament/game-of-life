@@ -58,6 +58,7 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GLCapabilities;
 import org.lwjgl.system.MemoryStack;
 
+
 public abstract class GLApplication {
 
 	private class ErrorHandler implements GLFWErrorCallbackI {
@@ -120,6 +121,7 @@ public abstract class GLApplication {
 		glfwShowWindow(window);
 
 		clearColor = getClearColor();
+
 		loadResources();
 	}
 
@@ -179,17 +181,17 @@ public abstract class GLApplication {
 
 	private void keyEvent(long window, int key, int scancode, int action, int mods) {
 		switch (action) {
-		case GLFW_PRESS:
-			keyPressed(key, scancode, mods);
-			break;
-		case GLFW_RELEASE:
-			keyReleased(key, scancode, mods);
-			break;
-		case GLFW_REPEAT:
-			keyRepeated(key, scancode, mods);
-			break;
-		default:
-			break;
+			case GLFW_PRESS:
+				keyPressed(key, scancode, mods);
+				break;
+			case GLFW_RELEASE:
+				keyReleased(key, scancode, mods);
+				break;
+			case GLFW_REPEAT:
+				keyRepeated(key, scancode, mods);
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -214,16 +216,16 @@ public abstract class GLApplication {
 
 	protected void keyReleased(int key, int scancode, int mods) {
 		switch (key) {
-		case GLFW_KEY_ESCAPE:
-			glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
-			break;
-		case GLFW_KEY_ENTER:
-			if ((mods & GLFW_MOD_ALT) != 0) {
-				switchFullScreen();
-			}
-			break;
-		default:
-			break;
+			case GLFW_KEY_ESCAPE:
+				glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
+				break;
+			case GLFW_KEY_ENTER:
+				if ((mods & GLFW_MOD_ALT) != 0) {
+					switchFullScreen();
+				}
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -262,7 +264,7 @@ public abstract class GLApplication {
 		glfwMakeContextCurrent(window);
 
 		GLCapabilities capabilities = GL.createCapabilities();
-		System.out.println(dump(capabilities,"OpenGL.*"));
+		System.out.println(dump(capabilities, "OpenGL.*"));
 
 		glfwDestroyWindow(window);
 
@@ -298,7 +300,7 @@ public abstract class GLApplication {
 		}
 		return sb.toString();
 	}
-	
+
 	private static boolean isPublicInstanceField(Field field) {
 		int modifiers = field.getModifiers();
 		return !Modifier.isStatic(modifiers) && Modifier.isPublic(modifiers);
