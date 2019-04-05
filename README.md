@@ -7,7 +7,8 @@ Currently use Java 2D API to render the universe.
 
 An functional interface for [coordinate wrapping](src/main/java/org/yah/games/gameoflife/java2d/universe/coordinates), with 3 implementations used to demonstrate efficiency of bitset operators versus modulo.
 
-Use org.yah.games.gameoflife.java2d.GameOfLife to launch the GUI, and the following keys mapping:
-* R : random universe
-* C : clear universe
-* Space : start / stop universe update
+Use org.yah.games.gameoflife.java2d.GameOfLife to launch the GUI, and the following keys mapping:   
+
++ **R** : random universe
++ **C** : clear universe
++ **Space** : start / stop universe update
