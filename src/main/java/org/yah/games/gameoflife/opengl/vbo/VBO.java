@@ -2,6 +2,7 @@ package org.yah.games.gameoflife.opengl.vbo;
 
 import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
 
 import java.nio.ByteBuffer;
@@ -13,11 +14,29 @@ import java.nio.ShortBuffer;
 
 import org.yah.games.gameoflife.opengl.GLObject;
 
-
 public class VBO extends GLObject {
 
-	private VBO(int vboId) {
+	private final Target target;
+
+	private VBO(int vboId, Target target) {
 		super(vboId);
+		this.target = target;
+	}
+
+	public void bind() {
+		glBindBuffer(target.getGlTarget(), id);
+	}
+
+	public static Builder builder(Target target) {
+		return new Builder(target);
+	}
+	
+	public void delete() {
+		glDeleteBuffers(id);
+	}
+
+	public static Builder builder() {
+		return new Builder();
 	}
 
 	public static class Builder {
@@ -95,10 +114,9 @@ public class VBO extends GLObject {
 			glBufferData(target.getGlTarget(), size, access.glUsage());
 			return this;
 		}
-	
+
 		public VBO build() {
-			glBindBuffer(target.getGlTarget(), 0);
-			return new VBO(id);
+			return new VBO(id, target);
 		}
 	}
 }

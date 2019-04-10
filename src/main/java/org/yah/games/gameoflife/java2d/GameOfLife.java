@@ -39,9 +39,9 @@ public class GameOfLife {
 
 	private static final Long SEED = null;
 
-	private static final int SIZE = 512;
+	private static final int SIZE = 1024;
 
-	private static final int THREADS = 1;
+	private static final int THREADS = 3;
 
 	private static final float RANDOM_FACTOR = .08f;
 

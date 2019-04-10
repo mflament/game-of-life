@@ -7,7 +7,9 @@ import static org.lwjgl.opengl.GL15.GL_STREAM_DRAW;
 public class BufferAccess {
 
 	public enum Frequency {
-		STREAM(GL_STREAM_DRAW), STATIC(GL_STATIC_DRAW), DYNAMIC(GL_DYNAMIC_DRAW);
+		STREAM(GL_STREAM_DRAW),
+		STATIC(GL_STATIC_DRAW),
+		DYNAMIC(GL_DYNAMIC_DRAW);
 
 		private final int baseUsage;
 
@@ -18,14 +20,16 @@ public class BufferAccess {
 	}
 
 	public enum Nature {
-		DRAW, READ, COPY;
+		DRAW,
+		READ,
+		COPY;
 	}
-	
+
 	private final Frequency frequency;
-	
+
 	private final Nature nature;
-	
-	public BufferAccess(Frequency frequency, Nature nature) {
+
+	private BufferAccess(Frequency frequency, Nature nature) {
 		super();
 		this.frequency = frequency;
 		this.nature = nature;
@@ -33,5 +37,9 @@ public class BufferAccess {
 
 	public int glUsage() {
 		return frequency.baseUsage + nature.ordinal();
+	}
+
+	public static BufferAccess from(Frequency frequency, Nature nature) {
+		return new BufferAccess(frequency, nature);
 	}
 }

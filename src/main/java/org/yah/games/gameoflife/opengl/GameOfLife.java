@@ -10,10 +10,10 @@ public class GameOfLife extends GL2DApplication {
 	}
 	
 	@Override
-	protected void render() {
-		// TODO Auto-generated method stub
+	protected boolean isDebugEnabled() {
+		return true;
 	}
-
+	
 	public static void main(String[] args) {
 		new GameOfLife().start();
 	}

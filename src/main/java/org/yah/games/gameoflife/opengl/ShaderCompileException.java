@@ -7,7 +7,7 @@ package org.yah.games.gameoflife.opengl;
  * @author Oodrive
  * @created 2019/03/27
  */
-public class ShaderCompileException extends Exception {
+public class ShaderCompileException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 

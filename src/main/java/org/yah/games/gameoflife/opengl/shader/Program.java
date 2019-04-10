@@ -4,13 +4,16 @@
 package org.yah.games.gameoflife.opengl.shader;
 
 import static org.lwjgl.opengl.GL11.GL_FALSE;
+import static org.lwjgl.opengl.GL11.GL_ZERO;
 import static org.lwjgl.opengl.GL20.GL_LINK_STATUS;
 import static org.lwjgl.opengl.GL20.glAttachShader;
 import static org.lwjgl.opengl.GL20.glCreateProgram;
+import static org.lwjgl.opengl.GL20.glDeleteProgram;
 import static org.lwjgl.opengl.GL20.glDetachShader;
 import static org.lwjgl.opengl.GL20.glGetAttribLocation;
 import static org.lwjgl.opengl.GL20.glGetProgramInfoLog;
 import static org.lwjgl.opengl.GL20.glGetProgrami;
+import static org.lwjgl.opengl.GL20.glLinkProgram;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 import static org.lwjgl.opengl.GL30.glBindFragDataLocation;
 
@@ -34,6 +37,10 @@ public class Program extends GLObject {
 	public void use() {
 		glUseProgram(id);
 	}
+
+	public void unuse() {
+		glUseProgram(GL_ZERO);
+	}
 	
 	public int findAttributeLocation(String attributeName) {
 		return glGetAttribLocation(id, attributeName);
@@ -44,6 +51,14 @@ public class Program extends GLObject {
 		if (loc == -1)
 			throw new IllegalArgumentException("Unknown attribute " + attributeName);
 		return loc;
+	}
+	
+	public void delete() {
+		glDeleteProgram(id);
+	}
+	
+	public static Builder builder() {
+		return new Builder();
 	}
 
 	public static class Builder {
@@ -67,8 +82,9 @@ public class Program extends GLObject {
 			return this;
 		}
 
-		public Program build() throws ProgramLinkException {
+		public Program build() {
 			try {
+				glLinkProgram(programId);
 				int linkStatus = glGetProgrami(programId, GL_LINK_STATUS);
 				if (linkStatus == GL_FALSE) {
 					String log = glGetProgramInfoLog(programId);

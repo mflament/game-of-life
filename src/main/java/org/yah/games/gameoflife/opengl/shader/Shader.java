@@ -17,13 +17,13 @@ import static org.lwjgl.opengl.GL20.glShaderSource;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.yah.games.gameoflife.opengl.GLApplication;
 import org.yah.games.gameoflife.opengl.GLObject;
 import org.yah.games.gameoflife.opengl.ShaderCompileException;
-
 
 /**
  * @author Oodrive
@@ -32,8 +32,9 @@ import org.yah.games.gameoflife.opengl.ShaderCompileException;
 public class Shader extends GLObject {
 
 	public enum Type {
-		VERTEX(GL_VERTEX_SHADER), FRAGMENT(GL_FRAGMENT_SHADER);
-		
+		VERTEX(GL_VERTEX_SHADER),
+		FRAGMENT(GL_FRAGMENT_SHADER);
+
 		private final int glType;
 
 		private Type(int glType) {
@@ -56,16 +57,18 @@ public class Shader extends GLObject {
 		glDeleteShader(id);
 	}
 
-	private static String readResource(String resource) throws IOException {
+	private static String readResource(String resource) {
 		ClassLoader classLoader = GLApplication.class.getClassLoader();
 		try (InputStream is = classLoader.getResourceAsStream(resource)) {
 			if (is == null)
 				throw new FileNotFoundException("Resource " + resource + " not found in classpath");
 			return IOUtils.toString(is, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 
-	private static Shader load(Type type, String resource) throws ShaderCompileException, IOException {
+	private static Shader load(Type type, String resource) {
 		int shaderId = glCreateShader(type.glType);
 		glShaderSource(shaderId, readResource(resource));
 		glCompileShader(shaderId);
@@ -77,11 +80,11 @@ public class Shader extends GLObject {
 		return new Shader(shaderId, type);
 	}
 
-	public static Shader vertexShader(String resource) throws ShaderCompileException, IOException {
+	public static Shader vertexShader(String resource) {
 		return load(Type.VERTEX, resource);
 	}
 
-	public static Shader fragmentShader(String resource) throws ShaderCompileException, IOException {
+	public static Shader fragmentShader(String resource) {
 		return load(Type.FRAGMENT, resource);
 	}
 

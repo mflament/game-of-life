@@ -2,6 +2,7 @@ package org.yah.games.gameoflife.opengl;
 
 import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MAJOR;
 import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MINOR;
+import static org.lwjgl.glfw.GLFW.GLFW_DEPTH_BITS;
 import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
@@ -13,6 +14,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 import static org.lwjgl.glfw.GLFW.GLFW_REPEAT;
 import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
+import static org.lwjgl.glfw.GLFW.GLFW_STENCIL_BITS;
 import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
 import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
 import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
@@ -38,8 +40,11 @@ import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_NO_ERROR;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.glGetError;
+import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -52,21 +57,13 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.glfw.GLFWErrorCallbackI;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GLCapabilities;
+import org.lwjgl.opengl.GLUtil;
 import org.lwjgl.system.MemoryStack;
 
-
 public abstract class GLApplication {
-
-	private class ErrorHandler implements GLFWErrorCallbackI {
-		@Override
-		public void invoke(int error, long description) {
-			handleError(error, GLFWErrorCallback.getDescription(description));
-		}
-	}
 
 	private long window;
 
@@ -74,6 +71,7 @@ public abstract class GLApplication {
 
 	public void start() {
 		setup();
+
 		try {
 			loop();
 		} finally {
@@ -81,13 +79,9 @@ public abstract class GLApplication {
 		}
 	}
 
-	protected void handleError(int error, String description) {
-		System.err.println(String.format("GLFW Error %d : %s", error, description));
-	}
-
 	private void setup() {
 		// Setup an error callback.
-		GLFWErrorCallback.create(new ErrorHandler()).set();
+		GLFWErrorCallback.createThrow().set();
 
 		// Initialize GLFW. Most GLFW functions will not work before doing this.
 		if (!glfwInit())
@@ -96,19 +90,26 @@ public abstract class GLApplication {
 		// Configure GLFW
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-		// glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, isDebugEnabled() ? GLFW_TRUE : GLFW_FALSE);
+		glfwWindowHint(GLFW_DEPTH_BITS, 24);
+		glfwWindowHint(GLFW_STENCIL_BITS, 8);
+
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+		if (isDebugEnabled()) {
+			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+		}
 
 		window = glfwCreateWindow(640, 480, getTitle(), NULL, NULL);
-		if (window == NULL)
+		if (window == NULL) {
 			throw new IllegalStateException("Unable to create window");
+		}
 
 		// Setup a key callback. It will be called every time a key is pressed, repeated
 		// or released.
 		glfwSetKeyCallback(window, this::keyEvent);
-
-		glfwSetFramebufferSizeCallback(window, (window, width, height) -> frameBufferResized(width, height));
 
 		centerWindow();
 
@@ -122,7 +123,20 @@ public abstract class GLApplication {
 
 		clearColor = getClearColor();
 
+		GL.createCapabilities();
+
+		glfwSetFramebufferSizeCallback(window, (window, width, height) -> frameBufferResized(width, height));
+
+		if (isDebugEnabled()) {
+			GLUtil.setupDebugMessageCallback();
+		}
+
 		loadResources();
+
+		int error = glGetError();
+		if (error != GL_NO_ERROR) {
+			throw new GLException("Error initializing application: " + error);
+		}
 	}
 
 	protected Color4f getClearColor() {
@@ -181,17 +195,17 @@ public abstract class GLApplication {
 
 	private void keyEvent(long window, int key, int scancode, int action, int mods) {
 		switch (action) {
-			case GLFW_PRESS:
-				keyPressed(key, scancode, mods);
-				break;
-			case GLFW_RELEASE:
-				keyReleased(key, scancode, mods);
-				break;
-			case GLFW_REPEAT:
-				keyRepeated(key, scancode, mods);
-				break;
-			default:
-				break;
+		case GLFW_PRESS:
+			keyPressed(key, scancode, mods);
+			break;
+		case GLFW_RELEASE:
+			keyReleased(key, scancode, mods);
+			break;
+		case GLFW_REPEAT:
+			keyRepeated(key, scancode, mods);
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -209,23 +223,23 @@ public abstract class GLApplication {
 	protected abstract void render();
 
 	protected void frameBufferResized(int width, int height) {
-		System.out.println("frameBufferResized(" + width + "," + height + ")");
+		glViewport(0, 0, width, height);
 	}
 
 	protected void keyPressed(int key, int scancode, int mods) {}
 
 	protected void keyReleased(int key, int scancode, int mods) {
 		switch (key) {
-			case GLFW_KEY_ESCAPE:
-				glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
-				break;
-			case GLFW_KEY_ENTER:
-				if ((mods & GLFW_MOD_ALT) != 0) {
-					switchFullScreen();
-				}
-				break;
-			default:
-				break;
+		case GLFW_KEY_ESCAPE:
+			glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
+			break;
+		case GLFW_KEY_ENTER:
+			if ((mods & GLFW_MOD_ALT) != 0) {
+				switchFullScreen();
+			}
+			break;
+		default:
+			break;
 		}
 	}
 
