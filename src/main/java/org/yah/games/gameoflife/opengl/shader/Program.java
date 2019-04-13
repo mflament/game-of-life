@@ -13,22 +13,25 @@ import static org.lwjgl.opengl.GL20.glDetachShader;
 import static org.lwjgl.opengl.GL20.glGetAttribLocation;
 import static org.lwjgl.opengl.GL20.glGetProgramInfoLog;
 import static org.lwjgl.opengl.GL20.glGetProgrami;
+import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 import static org.lwjgl.opengl.GL20.glLinkProgram;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 import static org.lwjgl.opengl.GL30.glBindFragDataLocation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.IntFunction;
 
 import org.yah.games.gameoflife.opengl.GLObject;
 import org.yah.games.gameoflife.opengl.ProgramLinkException;
+import org.yah.games.gameoflife.opengl.shader.uniform.Uniform;
 
 
 /**
- * @author Oodrive
+ * @author Marc Flament
  * @created 2019/03/29
  */
-public class Program extends GLObject {
+public final class Program extends GLObject {
 
 	public Program(int programId) {
 		super(programId);
@@ -53,8 +56,23 @@ public class Program extends GLObject {
 		return loc;
 	}
 	
+	@Override
 	public void delete() {
 		glDeleteProgram(id);
+	}
+	
+	public <T extends Uniform> T findUniform(String name, IntFunction<T> factory) {
+		int location = glGetUniformLocation(id, name);
+		if (location == -1)
+			return null;
+		return factory.apply(location);
+	}
+	
+	public <T extends Uniform> T getUniform(String name, IntFunction<T> factory) {
+		T res = findUniform(name, factory);
+		if (res == null)
+			throw new IllegalArgumentException("Unknown uniform " + name);
+		return res;
 	}
 	
 	public static Builder builder() {

@@ -24,6 +24,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 
+import org.yah.games.gameoflife.counter.TimeTracker;
 import org.yah.games.gameoflife.java2d.rule.IndexedRule;
 import org.yah.games.gameoflife.java2d.rule.Rule;
 import org.yah.games.gameoflife.java2d.rule.Rules;
@@ -34,14 +35,13 @@ import org.yah.games.gameoflife.java2d.universe.State;
 import org.yah.games.gameoflife.java2d.universe.Universe;
 import org.yah.games.gameoflife.java2d.universe.UniverseUpdater;
 
-
 public class GameOfLife {
 
 	private static final Long SEED = null;
 
 	private static final int SIZE = 1024;
 
-	private static final int THREADS = 3;
+	private static final int THREADS = 4;
 
 	private static final float RANDOM_FACTOR = .08f;
 
@@ -168,7 +168,7 @@ public class GameOfLife {
 	}
 
 	private void createFrame() {
-		frame = new JFrame("Game of Life [" + rule + "]");
+		frame = new JFrame("Game of Life (Java2D) [" + rule + "]");
 
 		canvas = createCanvas();
 		frame.getContentPane().add(canvas);
@@ -229,20 +229,20 @@ public class GameOfLife {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				switch (e.getKeyCode()) {
-					case KeyEvent.VK_R:
-						randomize();
-						break;
-					case KeyEvent.VK_C:
-						clear();
-						break;
-					case KeyEvent.VK_SPACE:
-						toggleUpdate();
-						break;
-					case KeyEvent.VK_ESCAPE:
-						frame.dispose();
-						break;
-					default:
-						break;
+				case KeyEvent.VK_R:
+					randomize();
+					break;
+				case KeyEvent.VK_C:
+					clear();
+					break;
+				case KeyEvent.VK_SPACE:
+					toggleUpdate();
+					break;
+				case KeyEvent.VK_ESCAPE:
+					frame.dispose();
+					break;
+				default:
+					break;
 				}
 			}
 		});
@@ -306,22 +306,10 @@ public class GameOfLife {
 		@Override
 		public void run() {
 			try {
-				int update = 0;
-				long elapsed = 0;
+				TimeTracker timedTracker = new TimeTracker();
 				while (!stopRequested.get()) {
 					if (backBuffer.lock()) {
-						long start = System.nanoTime();
-
-						frontBuffer.update(backBuffer);
-
-						elapsed += System.nanoTime() - start;
-						update++;
-						if (TimeUnit.SECONDS.convert(elapsed, TimeUnit.NANOSECONDS) > 1) {
-							System.out.println(update + " updates/s");
-							update = 0;
-							elapsed = 0;
-						}
-
+						timedTracker.track(() -> frontBuffer.update(backBuffer));
 						SwingUtilities.invokeLater(() -> render(backBuffer));
 						swap();
 						universe = frontBuffer.universe;

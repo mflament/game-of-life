@@ -2,12 +2,12 @@ package org.yah.games.gameoflife.opengl.vbo;
 
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 
-public enum Target {
+public enum BufferTarget {
 	ARRAY(GL_ARRAY_BUFFER);
 
 	private final int glTarget;
 
-	private Target(int glTarget) {
+	private BufferTarget(int glTarget) {
 		this.glTarget = glTarget;
 	}
 

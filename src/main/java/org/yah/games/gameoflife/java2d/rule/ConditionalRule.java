@@ -9,7 +9,7 @@ import org.yah.games.gameoflife.java2d.universe.State;
 /**
  * A rule implementation testing if the neighbors count is contained in the matching rule configuration array.
  * 
- * @author Oodrive
+ * @author Marc Flament
  * @created 2019/02/05
  */
 public class ConditionalRule extends AbstractRule {

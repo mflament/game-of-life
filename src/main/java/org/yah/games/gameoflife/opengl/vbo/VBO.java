@@ -16,9 +16,9 @@ import org.yah.games.gameoflife.opengl.GLObject;
 
 public class VBO extends GLObject {
 
-	private final Target target;
+	private final BufferTarget target;
 
-	private VBO(int vboId, Target target) {
+	private VBO(int vboId, BufferTarget target) {
 		super(vboId);
 		this.target = target;
 	}
@@ -27,10 +27,11 @@ public class VBO extends GLObject {
 		glBindBuffer(target.getGlTarget(), id);
 	}
 
-	public static Builder builder(Target target) {
+	public static Builder builder(BufferTarget target) {
 		return new Builder(target);
 	}
 	
+	@Override
 	public void delete() {
 		glDeleteBuffers(id);
 	}
@@ -41,15 +42,15 @@ public class VBO extends GLObject {
 
 	public static class Builder {
 
-		private final Target target;
+		private final BufferTarget target;
 
 		private final int id;
 
 		public Builder() {
-			this(Target.ARRAY);
+			this(BufferTarget.ARRAY);
 		}
 
-		public Builder(Target target) {
+		public Builder(BufferTarget target) {
 			this.target = target;
 			id = glGenBuffers();
 			glBindBuffer(target.getGlTarget(), id);

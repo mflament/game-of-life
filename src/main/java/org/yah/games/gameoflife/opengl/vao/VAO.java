@@ -44,6 +44,7 @@ public class VAO extends GLObject {
 		return program;
 	}
 
+	@Override
 	public void delete() {
 		glDeleteVertexArrays(id);
 	}

@@ -69,6 +69,10 @@ public abstract class GLApplication {
 
 	private Color4f clearColor;
 
+	protected int viewWidth;
+
+	protected int viewHeight;
+
 	public void start() {
 		setup();
 
@@ -102,7 +106,10 @@ public abstract class GLApplication {
 			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 		}
 
-		window = glfwCreateWindow(640, 480, getTitle(), NULL, NULL);
+		this.viewWidth = initialViewWidth();
+		this.viewHeight = initialViewHeight();
+
+		window = glfwCreateWindow(viewWidth, viewHeight, getTitle(), NULL, NULL);
 		if (window == NULL) {
 			throw new IllegalStateException("Unable to create window");
 		}
@@ -115,6 +122,7 @@ public abstract class GLApplication {
 
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(window);
+		
 		// Enable v-sync
 		glfwSwapInterval(isVSyncEnabled() ? 1 : 0);
 
@@ -133,10 +141,22 @@ public abstract class GLApplication {
 
 		loadResources();
 
+		checkError("setup");
+	}
+
+	protected final void checkError(String operation) {
 		int error = glGetError();
 		if (error != GL_NO_ERROR) {
-			throw new GLException("Error initializing application: " + error);
+			throw new GLException("Error during " + operation + " : " + error);
 		}
+	}
+
+	protected int initialViewWidth() {
+		return 512;
+	}
+
+	protected int initialViewHeight() {
+		return 512;
 	}
 
 	protected Color4f getClearColor() {
@@ -217,13 +237,14 @@ public abstract class GLApplication {
 		} else {
 			System.out.println("switchWindowed from " + monitor);
 		}
-
 	}
 
 	protected abstract void render();
 
 	protected void frameBufferResized(int width, int height) {
-		glViewport(0, 0, width, height);
+		this.viewWidth = width;
+		this.viewHeight = height;
+		glViewport(0, 0, viewWidth, viewHeight);
 	}
 
 	protected void keyPressed(int key, int scancode, int mods) {}

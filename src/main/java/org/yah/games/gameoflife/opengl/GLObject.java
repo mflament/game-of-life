@@ -4,7 +4,7 @@
 package org.yah.games.gameoflife.opengl;
 
 /**
- * @author Oodrive
+ * @author Marc Flament
  * @created 2019/03/29
  */
 public abstract class GLObject {
@@ -19,4 +19,5 @@ public abstract class GLObject {
 		return id;
 	}
 	
+	public abstract void delete();
 }

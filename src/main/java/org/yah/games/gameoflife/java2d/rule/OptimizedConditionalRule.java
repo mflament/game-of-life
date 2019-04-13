@@ -7,7 +7,7 @@ import org.yah.games.gameoflife.java2d.universe.State;
 
 
 /**
- * @author Oodrive
+ * @author Marc Flament
  * @created 2019/02/05
  */
 public class OptimizedConditionalRule extends AbstractRule {
