@@ -6,7 +6,7 @@ import java.awt.image.ImageProducer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yah.games.gameoflife.java2d.universe.Universe;
+import org.yah.games.gameoflife.universe.Universe;
 
 public class UniverseImageProducer implements ImageProducer {
 
@@ -14,14 +14,9 @@ public class UniverseImageProducer implements ImageProducer {
 
 	private final List<ImageConsumer> consumers = new ArrayList<>();
 
-	private Universe universe;
-
 	private final ColorModel colorModel = ColorModel.getRGBdefault();
 
-	public UniverseImageProducer(Universe universe) {
-		super();
-		this.universe = universe;
-	}
+	private Universe lastUniverse;
 
 	@Override
 	public void addConsumer(ImageConsumer ic) {
@@ -41,12 +36,13 @@ public class UniverseImageProducer implements ImageProducer {
 	@Override
 	public void startProduction(ImageConsumer ic) {
 		consumers.add(ic);
-		produce(ic);
+		if (lastUniverse != null)
+			produce(ic, lastUniverse);
 	}
 
 	public void update(Universe universe) {
-		this.universe = universe;
-		consumers.forEach(this::produce);
+		consumers.forEach(c -> produce(c, universe));
+		lastUniverse = universe;
 	}
 
 	@Override
@@ -54,9 +50,9 @@ public class UniverseImageProducer implements ImageProducer {
 		startProduction(ic);
 	}
 
-	private void produce(ImageConsumer ic) {
+	private void produce(ImageConsumer ic, Universe universe) {
 		ic.setHints(HINTS);
-		ic.setColorModel(colorModel );
+		ic.setColorModel(colorModel);
 		ic.setDimensions(universe.width(), universe.height());
 		ic.setPixels(0, 0, universe.width(), universe.height(), colorModel, universe.getPixels(), 0,
 				universe.width());
