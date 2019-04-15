@@ -24,7 +24,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
-import org.yah.games.opengl.GLApplication;
 import org.yah.games.opengl.GLObject;
 import org.yah.games.opengl.ShaderCompileException;
 
@@ -48,6 +47,8 @@ public class Shader extends GLObject {
 
 	private static final Pattern HOLDER_PATTERN = Pattern.compile("\\$\\{([\\w\\.\\-]+)\\}");
 
+	private static final ClassLoader CLASS_LOADER = Shader.class.getClassLoader();
+
 	private final Type type;
 
 	private Shader(int shaderId, Type type) {
@@ -65,8 +66,7 @@ public class Shader extends GLObject {
 	}
 
 	private static String readResource(String resource) {
-		ClassLoader classLoader = GLApplication.class.getClassLoader();
-		try (InputStream is = classLoader.getResourceAsStream(resource)) {
+		try (InputStream is = CLASS_LOADER.getResourceAsStream(resource)) {
 			if (is == null)
 				throw new FileNotFoundException("Resource " + resource + " not found in classpath");
 			return IOUtils.toString(is, StandardCharsets.UTF_8);
