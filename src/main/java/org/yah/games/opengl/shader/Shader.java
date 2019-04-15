@@ -28,6 +28,7 @@ import org.yah.games.opengl.GLApplication;
 import org.yah.games.opengl.GLObject;
 import org.yah.games.opengl.ShaderCompileException;
 
+
 /**
  * @author Marc Flament
  * @created 2019/03/27
@@ -85,7 +86,7 @@ public class Shader extends GLObject {
 		int status = glGetShaderi(shaderId, GL_COMPILE_STATUS);
 		if (status == GL_FALSE) {
 			String log = glGetShaderInfoLog(shaderId);
-			throw new ShaderCompileException(log);
+			throw new ShaderCompileException(log, source);
 		}
 		return new Shader(shaderId, type);
 	}

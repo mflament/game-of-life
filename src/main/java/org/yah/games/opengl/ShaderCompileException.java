@@ -11,8 +11,14 @@ public class ShaderCompileException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	public ShaderCompileException(String message) {
+	private final String source;
+
+	public ShaderCompileException(String message, String source) {
 		super(message);
+		this.source = source;
 	}
 
+	public String getSource() {
+		return source;
+	}
 }

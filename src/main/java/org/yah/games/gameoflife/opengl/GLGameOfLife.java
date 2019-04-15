@@ -28,16 +28,17 @@ import org.yah.games.opengl.vbo.BufferAccess.Nature;
 import org.yah.games.opengl.vbo.VBO;
 import org.yah.games.opengl.window.GLWindow;
 
+
 public class GLGameOfLife extends AbstractGameOfLife {
 
 	private static final String TITLE = "Game of Life (OpenGL)";
 
 	private final float[] QUAD_VERTICES = { -1, -1, 0, 1, //
-			-1, 1, 0, 0, //
-			1, 1, 1, 0, //
-			-1, -1, 0, 1, //
-			1, 1, 1, 0, //
-			1, -1, 1, 1 };
+	        -1, 1, 0, 0, //
+	        1, 1, 1, 0, //
+	        -1, -1, 0, 1, //
+	        1, 1, 1, 0, //
+	        1, -1, 1, 1 };
 
 	private GLWindow window;
 
@@ -66,26 +67,32 @@ public class GLGameOfLife extends AbstractGameOfLife {
 	protected void createWindow() {
 		int universeSize = configuration.getUniverseSize();
 		window = GLWindow.builder()
-			.withTitle(TITLE)
-			.withWidth(universeSize)
-			.withHeight(universeSize)
-			.withKeyPressHandler(this::keyPressed)
-			.build();
+		        .withTitle(TITLE)
+		        .withWidth(universeSize)
+		        .withHeight(universeSize)
+		        .withKeyPressHandler(this::keyPressed)
+		        .withMajorVersion(3)
+		        .withMinorVersion(3)
+		        .build();
 		window.show();
 
 		GL.createCapabilities();
 
 		renderProgram = Program.builder()
-			.with(Shader.vertexShader("shaders/render.vs.glsl"))
-			.with(Shader.fragmentShader("shaders/render.fs.glsl"))
-			.build();
+		        .with(Shader.vertexShader("shaders/render.vs.glsl"))
+		        .with(Shader.fragmentShader("shaders/render.fs.glsl"))
+		        .build();
 
 		vbo = VBO.builder().withData(QUAD_VERTICES, BufferAccess.from(Frequency.STATIC, Nature.DRAW)).build();
 		vao = VAO.builder(renderProgram, vbo)
-			.withAttribute("position", 2, ComponentType.FLOAT, false, ComponentType.FLOAT.sizeOf(4), 0)
-			.withAttribute("vTexCoordinate", 2, ComponentType.FLOAT, false, ComponentType.FLOAT.sizeOf(4),
-					ComponentType.FLOAT.sizeOf(2))
-			.build();
+		        .withAttribute("position", 2, ComponentType.FLOAT, false, ComponentType.FLOAT.sizeOf(4), 0)
+		        .withAttribute("vTexCoordinate",
+		                2,
+		                ComponentType.FLOAT,
+		                false,
+		                ComponentType.FLOAT.sizeOf(4),
+		                ComponentType.FLOAT.sizeOf(2))
+		        .build();
 		vao.bind();
 
 		glViewport(0, 0, universeSize, universeSize);
@@ -110,17 +117,16 @@ public class GLGameOfLife extends AbstractGameOfLife {
 		if (universeUpdater instanceof ShaderUniverseUpdater) {
 			universeRenderPreparator = u -> ((TextureUniverse) u).bind();
 			return new TextureUniverse(universeSize, universeSize);
-		} else {
-			if (universeTexture == null) {
-				//create the universe texture used for rendering (only once)
-				universeTexture = TextureUniverse.createUniverseTexture(universeSize, universeSize);
-				universeRenderPreparator = u -> {
-					universeTexture.bind();
-					TextureUniverse.updateData(((ByteBufferUniverse) u).getBuffer(), universeTexture);
-				};
-			}
-			return new ByteBufferUniverse(universeSize, universeSize);
 		}
+		if (universeTexture == null) {
+			//create the universe texture used for rendering (only once)
+			universeTexture = TextureUniverse.createUniverseTexture(universeSize, universeSize);
+			universeRenderPreparator = u -> {
+				universeTexture.bind();
+				TextureUniverse.updateData(((ByteBufferUniverse) u).getBuffer(), universeTexture);
+			};
+		}
+		return new ByteBufferUniverse(universeSize, universeSize);
 	}
 
 	@Override
@@ -164,17 +170,17 @@ public class GLGameOfLife extends AbstractGameOfLife {
 
 	protected void keyPressed(int key, int scancode, int mods) {
 		switch (key) {
-		case GLFW_KEY_SPACE:
-			toggleUpdate();
-			break;
-		case GLFW_KEY_R:
-			randomize();
-			break;
-		case GLFW_KEY_C:
-			clear();
-			break;
-		default:
-			break;
+			case GLFW_KEY_SPACE:
+				toggleUpdate();
+				break;
+			case GLFW_KEY_R:
+				randomize();
+				break;
+			case GLFW_KEY_C:
+				clear();
+				break;
+			default:
+				break;
 		}
 	}
 

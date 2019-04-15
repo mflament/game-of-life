@@ -1,5 +1,14 @@
 #version 330 core
 
+#define TOP_LEFT ivec2(-1, -1)
+#define TOP ivec2(0, -1)
+#define TOP_RIGHT ivec2(1, -1)
+#define LEFT ivec2(-1, 0)
+#define RIGHT ivec2(1, 0)
+#define BOTTOM_LEFT ivec2(-1, 1)
+#define BOTTOM ivec2(0, 1)
+#define BOTTOM_RIGHT ivec2(1, 1)
+
 uniform sampler2D universe;
 
 //layout(origin_upper_left) in vec4 gl_FragCoord;
@@ -10,19 +19,15 @@ out vec4 outColor;
 
 ${rule}
 
-float neighbor(vec2 c, ivec2 offset) {
-	return textureOffset(universe, c, offset).r;
-}
-
 int neighbors(vec2 c) {
-	float n = neighbor(c, ivec2(-1,-1));
-	n += neighbor(c, ivec2(0,-1));
-	n += neighbor(c, ivec2(1,-1));
-	n += neighbor(c, ivec2(-1,0));
-	n += neighbor(c, ivec2(1,0));
-	n += neighbor(c, ivec2(-1,1));
-	n += neighbor(c, ivec2(0,1));
-	n += neighbor(c, ivec2(1,1));
+	float n = textureOffset(universe, c, TOP_LEFT).r;
+	n += textureOffset(universe, c, TOP).r;
+	n += textureOffset(universe, c, TOP_RIGHT).r;
+	n += textureOffset(universe, c, LEFT).r;
+	n += textureOffset(universe, c, RIGHT).r;
+	n += textureOffset(universe, c, BOTTOM_LEFT).r;
+	n += textureOffset(universe, c, BOTTOM).r;
+	n += textureOffset(universe, c, BOTTOM_RIGHT).r;
 	return int(n);
 }
 
